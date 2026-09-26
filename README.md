@@ -36,14 +36,14 @@ npm run build
 npm run test:e2e
 ```
 
-Cobrem: erros de console, metadados de SEO, HTML pré-renderizado, overflow horizontal em 320–1920px, âncoras e links externos, acessibilidade (axe, WCAG AA), reduced motion, formulário → WhatsApp, menu móvel e FAQ.
+Cobrem: erros de console, metadados de SEO, HTML pré-renderizado, overflow horizontal em 320–1920px, âncoras e links externos, acessibilidade (axe, WCAG AA), reduced motion (inclusive sem transforms 3D), portfólio (links e imagens), Garantias, Depoimentos oculto quando vazio, 3D no desktop, formulário → WhatsApp, menu móvel e FAQ.
 
 ## Estrutura
 
 ```
 src/
   content/site.ts        ← TODOS os textos, serviços, FAQ, contatos. Edite aqui.
-  sections/              ← uma seção por arquivo (Hero, Manifesto, Services, Studies, Process, Faq, Contact)
+  sections/              ← uma seção por arquivo (Hero, Manifesto, Services, Portfolio, Testimonials, Process, Guarantees, Faq, Contact)
   components/            ← Header, Footer, Button, Logo, ícones, rótulos
   hooks/                 ← GSAP com escopo/limpeza, reveal por atributo, Lenis
   lib/motion.ts          ← registro do GSAP, curvas e checagens de reduced-motion/ponteiro
@@ -52,13 +52,23 @@ src/
   entry-server.tsx       ← render para a pré-renderização
 scripts/prerender.mjs    ← injeta o HTML e o <head> no build; gera sitemap/robots
 scripts/dev/             ← utilitários de QA (screenshots, tour de scroll, geração de OG/ícones)
+scripts/dev/portfolio.mjs ← recaptura os screenshots do portfólio (Playwright + ImageMagick)
+public/portfolio/        ← screenshots WebP dos sites do portfólio
 tests/                   ← Playwright
 ```
 
 ### Animações
 - Elementos com `data-reveal` entram ao rolar; `data-reveal="lines"` revela títulos linha a linha (componente `RevealLines`).
 - O estado inicial "escondido" só existe com a classe `motion-ok` no `<html>`, adicionada antes da pintura. Sem JS, com `prefers-reduced-motion` ou se o JS atrasar mais de 4s, tudo aparece normalmente.
-- Scroll horizontal dos Estudos só acontece em telas ≥1024px de largura e ≥640px de altura; no mobile é uma pilha vertical.
+- Scroll horizontal do Portfólio só acontece em telas ≥1024px de largura e ≥640px de altura; no mobile é uma pilha vertical.
+- O texto do hero entra por keyframes CSS (`index.css`), sem depender do JS; a montagem da planta é GSAP.
+- **3D (CSS transforms, sem WebGL), só em desktop com mouse:** a planta do hero tem 3 camadas (wireframe, design, código) que se separam em profundidade ao rolar para fora do hero; os mockups do portfólio inclinam até 6° seguindo o cursor (mola do Motion), com o celular num plano à frente. Mobile, touch e `prefers-reduced-motion` ficam planos. Nada roda em loop e `will-change` só fica ativo durante o movimento.
+
+### Portfólio, depoimentos e numeração
+- Projetos em `projects` (`content/site.ts`). `result` só deve ser preenchido com dado real confirmado pelo cliente.
+- Para trocar/atualizar imagens, rode `node scripts/dev/portfolio.mjs [id]` (captura 1440×900 e 390×844 em 2x, salva WebP q80).
+- Depoimentos: array `testimonials`. Vazio = a seção não existe no HTML. Somente depoimentos reais, com autorização por escrito.
+- Os rótulos [01], [02]… vêm de `sectionIndex()` e se ajustam quando Depoimentos aparece.
 
 ## Lovable → GitHub → VS Code
 
@@ -75,9 +85,13 @@ Este projeto é uma reconstrução completa e independente da Lovable (não há 
 
 ## Pendências (precisam da Axion)
 
+- [ ] **Condição para primeiros clientes:** preencher `firstClients.condition` em `src/content/site.ts` (`TODO(axion)`). Enquanto estiver vazio, o bloco no Contato convida a perguntar no WhatsApp.
+- [ ] **Depoimentos:** quando houver, com autorização por escrito, adicionar em `testimonials` (use `projectId` para ligar ao portfólio). A seção aparece sozinha.
+- [ ] **Resultados do portfólio:** o campo `result` de cada projeto está vazio. Preencha só com números reais e autorizados.
+- [ ] **Permissão dos clientes do portfólio:** confirmar por escrito que Automax, Gireh e Vitta Reale autorizam aparecer no site.
+- [ ] **Screenshots:** recapturar (`node scripts/dev/portfolio.mjs`) quando os sites dos clientes mudarem. O título "Excelência" no site da Vitta Reale tem o acento deslocado (problema de fonte no próprio site deles) — vale avisar o cliente.
+- [ ] **Lighthouse mobile ≥ 90:** medir no domínio publicado (PageSpeed Insights). Localmente (Windows, `vite preview`) o resultado oscila muito: 64–81 no código anterior a estas mudanças e 72–77 no atual, com a mesma causa (tempo de CPU simulado em aparelho lento), não as imagens — elas são lazy e não entram no carregamento inicial.
 - [ ] **E-mail:** `contato@axion.com` veio do site antigo, mas o domínio axion.com provavelmente não é da Axion. Confirme em `src/content/site.ts`.
 - [ ] **Domínio final:** definir `VITE_SITE_URL` (canonical, OG, sitemap usam esse valor).
-- [ ] **Portfólio real:** os 3 estudos são conceituais (e sinalizados assim no site). Quando houver projetos de clientes, substitua em `studies` e troque os mockups por imagens reais (WebP/AVIF, `loading="lazy"`).
-- [ ] **Depoimentos/números:** removidos por serem fictícios. Se houver depoimentos reais com autorização, dá para reintroduzir uma seção.
-- [ ] **Promessas comerciais mantidas do site antigo:** "entrega em até 7 dias", "proposta em até 24h", "suporte e manutenção". Confirme que continuam válidas.
+- [ ] **Promessas comerciais:** "entrega em até 7 dias", "proposta em até 24h", suporte após o lançamento e "ajustes até ficar como combinado" (seção Garantias). Confirme que continuam válidas.
 - [ ] Atualizar o ano do rodapé (`components/Footer.tsx`) anualmente.
