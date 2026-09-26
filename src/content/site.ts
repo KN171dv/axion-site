@@ -24,7 +24,7 @@ export const defaultWhatsappMessage = "Olá, Axion! Quero conversar sobre um sit
 
 export const nav = [
   { label: "Serviços", href: "#servicos" },
-  { label: "Estudos", href: "#estudos" },
+  { label: "Portfólio", href: "#portfolio" },
   { label: "Processo", href: "#processo" },
   { label: "Dúvidas", href: "#duvidas" },
 ] as const;
@@ -35,7 +35,7 @@ export const hero = {
   lead:
     "Projetamos e desenvolvemos sites institucionais e landing pages rápidos, claros e prontos para transformar visita em conversa no WhatsApp.",
   primaryCta: { label: "Pedir orçamento", href: "#contato" },
-  secondaryCta: { label: "Ver estudos", href: "#estudos" },
+  secondaryCta: { label: "Ver portfólio", href: "#portfolio" },
   facts: [
     { k: "Prazo", v: "Entrega em até 7 dias" },
     { k: "Resposta", v: "Proposta em até 24h" },
@@ -111,37 +111,96 @@ export const standards = [
   { k: "Suporte contínuo", v: "Ajustes e atualizações quando precisar." },
 ] as const;
 
-export type Study = {
-  id: "barbearia" | "oficina" | "restaurante";
+export type Project = {
+  id: string;
   name: string;
   segment: string;
-  goal: string;
-  decision: string;
+  location?: string;
+  url: string;
+  summary: string;
+  /** O que a Axion entregou, em itens curtos. */
+  whatDid: string[];
+  /** Resultado mensurável. Preencha somente com dado real, confirmado pelo cliente. */
+  result?: string;
+  /** Primeira dobra capturada por scripts/dev/portfolio.mjs (desktop 1600x1000, mobile 600x1298). */
+  images: { desktop: string; mobile: string; alt: string };
 };
 
-export const studies: Study[] = [
+export const projects: Project[] = [
   {
-    id: "barbearia",
-    name: "Barbearia Premium",
-    segment: "Beleza & estilo",
-    goal: "Encher a agenda da semana.",
-    decision: "Horários disponíveis logo na primeira tela. O cliente escolhe o corte e cai no WhatsApp com tudo preenchido.",
+    id: "automax",
+    name: "Automax Solution",
+    segment: "Automação comercial e tecnologia",
+    url: "https://automaxsolution.com.br/",
+    summary:
+      "Empresa de automação comercial, redes, CFTV, servidores e suporte técnico, que também tem um sistema próprio de gestão, o MaxPDV.",
+    whatDid: [
+      "Os 8 serviços apresentados",
+      "Destaque para o MaxPDV, com telas e botão de demonstração",
+      "Catálogo de produtos",
+      "Caminho direto para o pedido de orçamento",
+    ],
+    result: "",
+    images: {
+      desktop: "/portfolio/automax-desktop.webp",
+      mobile: "/portfolio/automax-mobile.webp",
+      alt: "Primeira dobra do site da Automax Solution: título “Tecnologia que impulsiona o crescimento da sua empresa” e botão para solicitar orçamento.",
+    },
   },
   {
-    id: "oficina",
-    name: "Oficina Performance",
-    segment: "Automotivo",
-    goal: "Tirar a desconfiança do orçamento.",
-    decision: "Serviços com escopo claro e um passo a passo do atendimento. Transparência vira argumento de venda.",
+    id: "gireh",
+    name: "Gireh Barber Shop",
+    segment: "Barbearia",
+    location: "Rio das Ostras, RJ · desde 2015",
+    url: "https://girehv2.vercel.app/",
+    summary: "Barbearia de Rio das Ostras. O site apresenta os serviços e leva o cliente direto para o agendamento pelo WhatsApp.",
+    whatDid: [
+      "Serviços: corte, barba, combo, sobrancelha e acabamento",
+      "Agendamento direto pelo WhatsApp",
+      "Endereço e horário de funcionamento na primeira tela",
+    ],
+    result: "",
+    images: {
+      desktop: "/portfolio/gireh-desktop.webp",
+      mobile: "/portfolio/gireh-mobile.webp",
+      alt: "Primeira dobra do site da Gireh Barber Shop: fachada da barbearia ao fundo, título “Corte, barba e acabamento no detalhe” e botão para agendar horário.",
+    },
   },
   {
-    id: "restaurante",
-    name: "Sabor Urbano",
-    segment: "Gastronomia",
-    goal: "Levar pedidos direto, sem taxa de aplicativo.",
-    decision: "Cardápio legível no celular, com pedido pelo WhatsApp a partir de cada prato.",
+    id: "vitta-reale",
+    name: "Clínica Vitta Reale",
+    segment: "Odontologia estética e harmonização facial",
+    location: "Taquara, RJ",
+    url: "https://vitta-reale.lovable.app/",
+    summary:
+      "Clínica da Dra. Letícia Beatriz, com duas áreas de atendimento. Visual escuro com dourado, alinhado ao posicionamento premium da clínica.",
+    whatDid: [
+      "Procedimentos organizados em duas áreas: harmonização facial e odontologia",
+      "Apresentação da profissional e do espaço",
+      "Agendamento pelo WhatsApp",
+    ],
+    result: "",
+    images: {
+      desktop: "/portfolio/vitta-reale-desktop.webp",
+      mobile: "/portfolio/vitta-reale-mobile.webp",
+      alt: "Primeira dobra do site da Clínica Vitta Reale: fundo escuro com detalhes dourados, título “Exclusividade, Naturalidade e Excelência” e foto da Dra. Letícia no consultório.",
+    },
   },
 ];
+
+export type Testimonial = {
+  name: string;
+  role: string;
+  company: string;
+  text: string;
+  photo?: string;
+  /** id de um item de `projects`, para ligar o depoimento ao projeto no portfólio. */
+  projectId?: string;
+};
+
+// Somente depoimentos reais, com autorização por escrito do cliente.
+// Enquanto a lista estiver vazia, a seção Depoimentos não aparece no site.
+export const testimonials: Testimonial[] = [];
 
 export const process = [
   {
@@ -165,6 +224,21 @@ export const process = [
     text: "Publicação, treinamento e suporte para você seguir com tranquilidade depois que o site está no ar.",
   },
 ] as const;
+
+export const guarantees = [
+  { k: "Proposta em até 24h", v: "Você conta o que precisa e recebe escopo, prazo e valor em até 24 horas." },
+  { k: "Você aprova o layout antes do código", v: "Nada é desenvolvido sem o seu ok no design. Mudar de ideia nessa fase custa minutos, não dias." },
+  { k: "Ajustes até ficar como combinado", v: "Se algo não saiu como definimos na proposta, a gente ajusta até ficar." },
+  { k: "Suporte depois do lançamento", v: "O site no ar é o começo. Você continua tendo com quem falar para ajustes e dúvidas." },
+] as const;
+
+export const firstClients = {
+  label: "Primeiros clientes",
+  text: "Estamos formando o nosso portfólio. Os próximos projetos têm uma condição especial em troca de um depoimento e da permissão para mostrar o site aqui.",
+  // TODO(axion): descrever a condição especial. Enquanto estiver vazio, o bloco convida a perguntar no WhatsApp.
+  condition: "" as string,
+  whatsappMessage: "Olá, Axion! Quero saber da condição especial para primeiros clientes.",
+} as const;
 
 export const faq = [
   {
@@ -197,3 +271,10 @@ export const seo = {
     "Sites institucionais e landing pages rápidos, exclusivos e prontos para converter visitas em contatos no WhatsApp. Proposta em até 24h.",
   ogImage: "/og.png",
 } as const;
+
+/** Numeração dos rótulos [01], [02]… Depoimentos só entra na conta quando houver algum. */
+const sectionOrder = ["sobre", "servicos", "portfolio", "depoimentos", "processo", "garantias", "duvidas", "contato"] as const;
+export function sectionIndex(id: (typeof sectionOrder)[number]) {
+  const visible = sectionOrder.filter((s) => s !== "depoimentos" || testimonials.length > 0);
+  return String(visible.indexOf(id) + 1).padStart(2, "0");
+}

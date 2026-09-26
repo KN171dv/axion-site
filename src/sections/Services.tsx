@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { ArrowUpRight } from "../components/Icons";
 import { RevealLines } from "../components/RevealLines";
 import { SectionLabel } from "../components/SectionLabel";
-import { services, standards, whatsappLink } from "../content/site";
+import { sectionIndex, services, standards, whatsappLink } from "../content/site";
 import { useGsapContext } from "../hooks/useGsapContext";
 import { gsap } from "../lib/motion";
 
@@ -30,7 +30,7 @@ export function Services() {
         <div className="container-x">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
             <div className="lg:col-span-7">
-              <SectionLabel index="02" tone="light">
+              <SectionLabel index={sectionIndex("servicos")} tone="light">
                 Serviços
               </SectionLabel>
               <RevealLines

@@ -10,7 +10,7 @@ await page.waitForTimeout(1500);
 const stops = (process.env.STOPS ?? "").split(",").filter(Boolean);
 let i = 0;
 for (const sel of stops) {
-  // sel pode ser um seletor + deslocamento: "#estudos@1200"
+  // sel pode ser um seletor + deslocamento: "#portfolio@1200"
   const [s, off] = sel.split("@");
   const y = await page.evaluate(([s, off]) => { const el = document.querySelector(s); return (el ? el.getBoundingClientRect().top + scrollY : 0) + Number(off || 0); }, [s, off]);
   await page.evaluate((y) => window.scrollTo({ top: y, behavior: "instant" }), y);

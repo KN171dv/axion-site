@@ -3,7 +3,7 @@ import { useId, useState } from "react";
 import { Plus } from "../components/Icons";
 import { RevealLines } from "../components/RevealLines";
 import { SectionLabel } from "../components/SectionLabel";
-import { faq } from "../content/site";
+import { faq, sectionIndex } from "../content/site";
 import { easeCss } from "../lib/motion";
 
 export function Faq() {
@@ -14,7 +14,7 @@ export function Faq() {
     <section id="duvidas" data-tone="light" aria-labelledby="duvidas-title" className="section-y border-t border-line-light bg-paper text-ink">
       <div className="container-x grid gap-12 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-4">
-          <SectionLabel index="05" tone="light">
+          <SectionLabel index={sectionIndex("duvidas")} tone="light">
             Dúvidas
           </SectionLabel>
           <RevealLines id="duvidas-title" lines={["Antes de", "conversar."]} className="h2 mt-8 md:mt-10" />

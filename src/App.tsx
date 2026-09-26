@@ -5,11 +5,13 @@ import { useScrollReveal } from "./hooks/useScrollReveal";
 import { useSmoothScroll } from "./hooks/useSmoothScroll";
 import { Contact } from "./sections/Contact";
 import { Faq } from "./sections/Faq";
+import { Guarantees } from "./sections/Guarantees";
 import { Hero } from "./sections/Hero";
 import { Manifesto } from "./sections/Manifesto";
+import { Portfolio } from "./sections/Portfolio";
 import { Process } from "./sections/Process";
 import { Services } from "./sections/Services";
-import { Studies } from "./sections/Studies";
+import { Testimonials } from "./sections/Testimonials";
 
 // Recursos de animação do Motion carregados depois da primeira pintura.
 const loadMotionFeatures = () => import("./lib/motionFeatures").then((m) => m.default);
@@ -25,8 +27,10 @@ export function App() {
         <Hero />
         <Manifesto />
         <Services />
-        <Studies />
+        <Portfolio />
+        <Testimonials />
         <Process />
+        <Guarantees />
         <Faq />
         <Contact />
       </main>

@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { RevealLines } from "../components/RevealLines";
 import { SectionLabel } from "../components/SectionLabel";
-import { process } from "../content/site";
+import { process, sectionIndex } from "../content/site";
 import { useGsapContext } from "../hooks/useGsapContext";
 import { gsap } from "../lib/motion";
 
@@ -34,7 +34,7 @@ export function Process() {
       <div className="container-x grid gap-16 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-5">
           <div className="lg:sticky lg:top-32">
-            <SectionLabel index="04" tone="light">
+            <SectionLabel index={sectionIndex("processo")} tone="light">
               Processo
             </SectionLabel>
             <RevealLines id="processo-title" lines={["Do briefing", "ao ar, sem", "mistério."]} className="h2 mt-8 md:mt-10" />

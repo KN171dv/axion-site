@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { SectionLabel } from "../components/SectionLabel";
-import { manifesto } from "../content/site";
+import { manifesto, sectionIndex } from "../content/site";
 import { useGsapContext } from "../hooks/useGsapContext";
 import { gsap } from "../lib/motion";
 
@@ -25,7 +25,7 @@ export function Manifesto() {
   return (
     <section id="sobre" ref={ref} data-tone="dark" aria-labelledby="sobre-title" className="section-y relative">
       <div className="container-x">
-        <SectionLabel index="01">{manifesto.label}</SectionLabel>
+        <SectionLabel index={sectionIndex("sobre")}>{manifesto.label}</SectionLabel>
         <h2 id="sobre-title" className="sr-only">
           Sobre a Axion
         </h2>

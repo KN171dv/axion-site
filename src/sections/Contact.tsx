@@ -3,7 +3,7 @@ import { Button } from "../components/Button";
 import { ArrowUpRight, Instagram, Mail, WhatsApp } from "../components/Icons";
 import { RevealLines } from "../components/RevealLines";
 import { SectionLabel } from "../components/SectionLabel";
-import { contact, defaultWhatsappMessage, projectTypes, whatsappLink } from "../content/site";
+import { contact, defaultWhatsappMessage, firstClients, projectTypes, sectionIndex, whatsappLink } from "../content/site";
 
 /**
  * Não há backend: o formulário só monta uma mensagem e abre o WhatsApp.
@@ -51,7 +51,7 @@ export function Contact() {
       <div aria-hidden="true" className="blueprint pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_20%_30%,black,transparent_70%)]" />
       <div className="container-x grid gap-16 lg:grid-cols-12 lg:gap-8">
         <div className="lg:col-span-6">
-          <SectionLabel index="06">Contato</SectionLabel>
+          <SectionLabel index={sectionIndex("contato")}>Contato</SectionLabel>
           <RevealLines
             id="contato-title"
             lines={["Vamos", "construir", <>o seu<span className="text-accent">.</span></>]}
@@ -81,6 +81,26 @@ export function Contact() {
               </a>
             </li>
           </ul>
+
+          <aside aria-labelledby={`${id}-first`} className="mt-12 max-w-[30rem] border-l border-accent/60 py-1 pl-5" data-reveal>
+            <p id={`${id}-first`} className="label text-accent-hi">
+              {firstClients.label}
+            </p>
+            <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-dark">{firstClients.text}</p>
+            {firstClients.condition ? (
+              <p className="mt-2 text-[0.9375rem] leading-relaxed">{firstClients.condition}</p>
+            ) : (
+              <a
+                href={whatsappLink(firstClients.whatsappMessage)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 text-[0.9375rem] font-medium"
+              >
+                <span className="link-underline">Perguntar pela condição</span>
+                <ArrowUpRight className="size-4" />
+              </a>
+            )}
+          </aside>
         </div>
 
         <form

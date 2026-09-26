@@ -5,7 +5,7 @@ const page = await browser.newPage({ viewport: { width: w, height: h } });
 await page.goto(process.env.URL ?? "http://localhost:4173/", { waitUntil: "networkidle" });
 await page.waitForTimeout(1200);
 await page.mouse.move(w / 2, h / 2);
-const start = await page.evaluate(() => document.querySelector("#estudos").getBoundingClientRect().top + scrollY);
+const start = await page.evaluate(() => document.querySelector("#portfolio").getBoundingClientRect().top + scrollY);
 // rola por roda até o início da seção
 let y = 0;
 while (y < start + Number(process.env.FROM ?? 600)) { await page.mouse.wheel(0, 500); y += 500 * 0.9; await page.waitForTimeout(60); }
