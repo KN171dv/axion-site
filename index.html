@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0c0e" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!--head-->
+    <script>
+      /* Marca o documento para animações antes da primeira pintura.
+         Se o JS principal não carregar em 4s, desliga as animações para nunca esconder conteúdo. */
+      (function () {
+        try {
+          if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+          var d = document.documentElement;
+          d.classList.add("motion-ok");
+          setTimeout(function () {
+            if (!d.classList.contains("motion-ready")) {
+              d.classList.remove("motion-ok");
+              d.classList.add("motion-off");
+            }
+          }, 4000);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"><!--app--></div>
+    <noscript><style>html.motion-ok [data-reveal]{opacity:1!important} html.motion-ok .line-inner{transform:none!important}</style></noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
