@@ -24,6 +24,8 @@ test.describe("Axion — site", () => {
     expect(html).toContain("Sites feitos");
     expect(html).toContain("Quatro formatos.");
     expect(html).toContain("Quanto custa um site?");
+    expect(html).toContain("Sites no ar,");
+    expect(html).not.toContain("Não representam clientes");
   });
 
   for (const width of [320, 375, 390, 430, 768, 1280, 1440, 1920]) {
@@ -63,6 +65,137 @@ test.describe("Axion — site", () => {
     await expect(page.locator("#hero-title")).toBeVisible();
     const hidden = await page.$$eval("[data-reveal]", (els) => els.filter((e) => getComputedStyle(e).opacity === "0").length);
     expect(hidden).toBe(0);
+    await ctx.close();
+  });
+
+test.describe("portfólio", () => {
+    const expected = [
+      { name: "Automax Solution", url: "https://automaxsolution.com.br/" },
+      { name: "Gireh Barber Shop", url: "https://girehv2.vercel.app/" },
+      { name: "Clínica Vitta Reale", url: "https://vitta-reale.lovable.app/" },
+    ];
+
+    test("mostra os 3 projetos reais com link seguro para o site ao vivo", async ({ page }) => {
+      await page.goto("/");
+      const section = page.locator("#portfolio");
+      await expect(section.getByRole("heading", { level: 2 })).toContainText("Sites no ar");
+      await expect(section.locator("article")).toHaveCount(3);
+      for (const p of expected) {
+        const article = section.locator("article", { has: page.getByRole("heading", { name: p.name, exact: true }) });
+        const link = article.getByRole("link", { name: /Ver site ao vivo/ });
+        await expect(link).toHaveAttribute("href", p.url);
+        await expect(link).toHaveAttribute("target", "_blank");
+        await expect(link).toHaveAttribute("rel", /noopener/);
+        await expect(link).toHaveAttribute("rel", /noreferrer/);
+      }
+      // O menu e o rodapé apontam para a seção nova
+      await expect(page.locator('footer a[href="#portfolio"]')).toHaveCount(1);
+      await expect(page.locator('a[href="#estudos"]')).toHaveCount(0);
+    });
+
+    test("imagens do portfólio existem, são lazy e carregam", async ({ page, request }) => {
+      await page.goto("/");
+      const imgs = page.locator("#portfolio img");
+      await expect(imgs).toHaveCount(6);
+      const attrs = await imgs.evaluateAll((els) =>
+        (els as HTMLImageElement[]).map((i) => ({
+          src: i.getAttribute("src")!,
+          alt: i.alt,
+          loading: i.loading,
+          decoding: i.decoding,
+          w: i.getAttribute("width"),
+          h: i.getAttribute("height"),
+        })),
+      );
+      for (const a of attrs) {
+        expect(a.src).toMatch(/^\/portfolio\/.+\.webp$/);
+        expect(a.alt.length).toBeGreaterThan(10);
+        expect(a.loading).toBe("lazy");
+        expect(a.decoding).toBe("async");
+        expect(Number(a.w)).toBeGreaterThan(0);
+        expect(Number(a.h)).toBeGreaterThan(0);
+        const res = await request.get(a.src);
+        expect(res.status(), a.src).toBe(200);
+        expect(res.headers()["content-type"]).toContain("image/webp");
+      }
+      // Ao entrar na tela, cada imagem decodifica de verdade
+      for (let i = 0; i < 6; i++) {
+        const img = imgs.nth(i);
+        await img.evaluate((el) => el.scrollIntoView({ block: "center", inline: "center" }));
+        await expect.poll(() => img.evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  test("Depoimentos não aparece enquanto não houver depoimento real", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#depoimentos")).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: /Depoimentos/i })).toHaveCount(0);
+    // A numeração dos rótulos não pula número
+    const labels = (await page.locator("section p.label span.tabular").allTextContents()).filter((t) => /^\[\d+\]$/.test(t));
+    expect(labels).toEqual(["[01]", "[02]", "[03]", "[04]", "[05]", "[06]", "[07]"]);
+  });
+
+  test("Garantias aparece entre Processo e Dúvidas com os 4 compromissos", async ({ page }) => {
+    await page.goto("/");
+    const ids = await page.$$eval("main > section[id]", (els) => els.map((e) => e.id));
+    expect(ids.indexOf("garantias")).toBe(ids.indexOf("processo") + 1);
+    expect(ids.indexOf("duvidas")).toBe(ids.indexOf("garantias") + 1);
+    const section = page.locator("#garantias");
+    await section.scrollIntoViewIfNeeded();
+    await expect(section).toBeVisible();
+    await expect(section.locator("li")).toHaveCount(4);
+    for (const t of ["Proposta em até 24h", "layout antes do código", "Ajustes até ficar como combinado", "Suporte depois do lançamento"]) {
+      await expect(section.getByText(t)).toBeVisible();
+    }
+  });
+
+  test("3D: planta do hero vira vista explodida ao rolar (desktop com mouse)", async ({ page, isMobile }) => {
+    test.skip(isMobile, "3D só em desktop com mouse");
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(2500);
+    const flat = await page.locator(".bp-stack").evaluate((el) => getComputedStyle(el).transform);
+    expect(flat === "none" || !flat.startsWith("matrix3d")).toBe(true);
+    for (let i = 0; i < 4; i++) {
+      await page.mouse.wheel(0, 120);
+      await page.waitForTimeout(80);
+    }
+    await expect.poll(() => page.locator(".bp-layer").last().evaluate((el) => getComputedStyle(el).transform)).toMatch(/^matrix3d/);
+  });
+
+  test("3D: mockups do portfólio inclinam com o mouse (desktop)", async ({ page, isMobile }) => {
+    test.skip(isMobile, "inclinação só com mouse");
+    // Página nova: depois de rolar com a roda, o Lenis desfaria o scrollIntoView.
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const mock = page.locator("#portfolio [data-tilt]").first();
+    await mock.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1500); // scroll suave + scrub assentarem
+    const box = (await mock.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.2, { steps: 8 });
+    await expect.poll(() => mock.locator(".pf-tilt").evaluate((el) => getComputedStyle(el).transform)).not.toBe("none");
+  });
+
+  test("reduced motion: nada em 3D, nem ao rolar nem com o mouse", async ({ browser }) => {
+    const ctx = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.evaluate(() => window.scrollTo(0, 400));
+    await page.waitForTimeout(300);
+    const mock = page.locator("#portfolio .pf-tilt").first();
+    await mock.scrollIntoViewIfNeeded();
+    const box = (await mock.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.1, { steps: 5 });
+    await page.waitForTimeout(400);
+    const transforms = await page.$$eval(".bp-stack, .bp-layer, .bp-tag, .pf-tilt, .pf-phone, .hero-visual", (els) =>
+      els.map((e) => getComputedStyle(e).transform),
+    );
+    expect(transforms.length).toBeGreaterThan(0);
+    for (const t of transforms) expect(t === "none" || !t.startsWith("matrix3d")).toBe(true);
+    expect(await page.locator("[data-tilt]").count()).toBe(0);
     await ctx.close();
   });
 
