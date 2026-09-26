@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Axion design tokens
+   Base: grafite + osso. Um único acento (azul do logo), usado com parcimônia.
+--------------------------------------------------------------------------- */
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --color-ink: #0b0c0e;
+  --color-ink-2: #121418;
+  --color-ink-3: #1b1e24;
+  --color-bone: #ece9e2;
+  --color-bone-2: #e2ded5;
+  --color-paper: #f5f3ee;
+  --color-accent: #3b7bff;
+  --color-accent-hi: #6d9dff;
+  --color-accent-lo: #1f56d6;
+  --color-action: #2b63ea; /* fundo de botões: branco sobre ele = 5.1:1 (AA) */
+
+  /* Linhas e textos secundários, calibrados para AA sobre cada base */
+  --color-line-dark: rgb(236 233 226 / 0.1);
+  --color-line-light: rgb(11 12 14 / 0.12);
+  --color-muted-dark: #a3a39e;
+  --color-muted-light: #5a5a55;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --breakpoint-xs: 22.5rem;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-padding-top: 5rem;
+    background: var(--color-ink);
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Com Lenis ativo o scroll suave é dele; sem JS/Lenis, âncoras continuam suaves. */
+  @media (prefers-reduced-motion: no-preference) {
+    html:not(.lenis) {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  .container-x {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 48rem) {
+    .container-x {
+      padding-inline: 2rem;
+    }
+  }
+  @media (min-width: 80rem) {
+    .container-x {
+      padding-inline: 3rem;
+    }
+  }
+
+  .section-y {
+    padding-block: clamp(5.5rem, 12vw, 11rem);
+  }
+
+  /* Rótulo técnico: [ 01 ] Serviços */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .display {
+    font-weight: 560;
+    letter-spacing: -0.045em;
+    line-height: 0.92;
+  }
+
+  .h2 {
+    font-size: clamp(2.25rem, 1.2rem + 4.2vw, 5rem);
+    font-weight: 540;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .lead {
+    font-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.25rem);
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+
+  /* Grid técnico de fundo (planta) */
+  .blueprint {
+    background-image:
+      linear-gradient(to right, var(--grid-color, rgb(236 233 226 / 0.055)) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-color, rgb(236 233 226 / 0.055)) 1px, transparent 1px);
+    background-size: var(--grid-size, 72px) var(--grid-size, 72px);
+  }
+
+  /* Revela o link sublinhado da esquerda para a direita */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    transition: background-size 0.5s var(--ease-out-expo);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+@layer utilities {
+  .text-muted-dark {
+    color: var(--color-muted-dark);
+  }
+  .text-muted-light {
+    color: var(--color-muted-light);
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Estado inicial dos elementos animados só existe quando o JS de motion está ativo.
+   Sem JS, com reduced-motion ou no HTML pré-renderizado, tudo aparece normalmente. */
+html.motion-ok [data-reveal] {
+  opacity: 0;
+}
+html.motion-ok [data-reveal="lines"] {
+  opacity: 1;
+}
+html.motion-ok [data-reveal="lines"] .line-inner {
+  transform: translateY(105%);
+}
+
+.line-mask {
+  display: block;
+  overflow: hidden;
+  /* espaço para descendentes (g, p, ç) sem cortar */
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.line-inner {
+  display: block;
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Planta do hero: estados iniciais antes da timeline (evita flash no HTML pré-renderizado) */
+.bp-draw {
+  stroke-dasharray: 1;
+}
+html.motion-ok :is(.bp-bar, .bp-block, .bp-cta, .bp-card, .bp-anno, .bp-status, .bp-cursor) {
+  opacity: 0;
+}
+html.motion-ok .bp-draw {
+  stroke-dashoffset: 1;
+  fill-opacity: 0;
+}
