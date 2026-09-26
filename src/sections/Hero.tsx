@@ -13,10 +13,7 @@ export function Hero() {
   useGsapContext(ref, ({ root, mm }) => {
     const tl = gsap.timeline({ defaults: { ease: ease.out }, delay: 0.1 });
 
-    tl.fromTo(".hero-eyebrow", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.8 })
-      .fromTo(".hero-title .line-inner", { yPercent: 105, y: 0 }, { yPercent: 0, y: 0, duration: 1.2, stagger: 0.09 }, 0.1)
-      .fromTo(".hero-copy", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.9, stagger: 0.08 }, 0.55)
-      .fromTo(".hero-fact", { opacity: 0 }, { opacity: 1, duration: 0.6, stagger: 0.06 }, 0.8);
+    // Texto do hero entra por CSS (index.css, .hero-in): começa na primeira pintura, sem esperar o JS.
 
     // Montagem da planta
     const bp = gsap.timeline({ defaults: { ease: ease.out } });
@@ -35,7 +32,7 @@ export function Hero() {
       .fromTo(".bp-cursor", { opacity: 0, x: 540, y: 400 }, { opacity: 1, x: 520, y: 380, duration: 0.3 }, "-=0.2")
       .to(".bp-cursor", { x: 128, y: 276, duration: 1.1, ease: "power3.inOut" })
       .to(".bp-cursor", { scale: 0.85, duration: 0.08, yoyo: true, repeat: 1, transformOrigin: "0 0" })
-      .fromTo(".bp-ripple", { opacity: 0.9, attr: { r: 16 } }, { opacity: 0, attr: { r: 44 }, duration: 0.7 }, "<")
+      .fromTo(".bp-ripple", { opacity: 0.9, attr: { r: 16 } }, { opacity: 0, attr: { r: 44 }, duration: 0.7, immediateRender: false }, "<")
       .fromTo(".bp-status", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.35");
     tl.add(bp, 0.35);
 

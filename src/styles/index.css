@@ -200,3 +200,54 @@ html.motion-ok .bp-draw {
   stroke-dashoffset: 1;
   fill-opacity: 0;
 }
+
+/* Entrada do texto do hero em CSS: começa na primeira pintura, sem esperar o JS
+   (o hero é o LCP). Mesmas curvas e tempos da timeline de montagem. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise, 16px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-line {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+html.motion-ok .hero-eyebrow {
+  animation: hero-rise 0.8s var(--ease-out-expo) 0.1s both;
+  --rise: 12px;
+}
+html.motion-ok .hero-title .line-inner {
+  animation: hero-line 1.2s var(--ease-out-expo) both;
+}
+html.motion-ok .hero-title .line-mask:nth-child(1) .line-inner { animation-delay: 0.2s; }
+html.motion-ok .hero-title .line-mask:nth-child(2) .line-inner { animation-delay: 0.29s; }
+html.motion-ok .hero-title .line-mask:nth-child(3) .line-inner { animation-delay: 0.38s; }
+html.motion-ok .hero-copy {
+  animation: hero-rise 0.9s var(--ease-out-expo) 0.65s both;
+  --rise: 20px;
+}
+html.motion-ok .hero-copy + .hero-copy {
+  animation-delay: 0.73s;
+}
+html.motion-ok .hero-fact {
+  animation: hero-fade 0.6s var(--ease-out-expo) 0.9s both;
+}
+html.motion-ok .hero-fact:nth-child(2) { animation-delay: 0.96s; }
+html.motion-ok .hero-fact:nth-child(3) { animation-delay: 1.02s; }
