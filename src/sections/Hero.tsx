@@ -39,19 +39,41 @@ export function Hero() {
       .fromTo(".bp-status", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.6 }, "-=0.35");
     tl.add(bp, 0.35);
 
-    // Saída: o título sobe mais devagar que a planta — profundidade sem exagero.
-    mm.add("(min-width: 1024px)", () => {
+    // Saída (desktop com mouse): o título sobe mais devagar e a planta vira uma vista explodida —
+    // wireframe, design e código se separam em profundidade, como camadas de uma obra.
+    mm.add("(min-width: 1024px) and (hover: hover) and (pointer: fine)", () => {
       gsap.to(".hero-title", {
         yPercent: -12,
         ease: "none",
         scrollTrigger: { trigger: root, start: "top top", end: "bottom top", scrub: true },
       });
-      gsap.to(".hero-visual", {
-        y: -80,
-        rotateX: 8,
-        ease: "none",
-        scrollTrigger: { trigger: root, start: "top top", end: "bottom top", scrub: true },
-      });
+
+      const stack = root.querySelector<HTMLElement>(".bp-stack");
+      const layers = gsap.utils.toArray<HTMLElement>(".bp-layer", root);
+      const [wire, , code] = layers;
+      if (!stack || !wire || !code) return;
+      const moving = [stack, ...layers];
+      gsap.set(moving, { transformStyle: "preserve-3d" });
+
+      gsap
+        .timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: {
+            trigger: root,
+            start: "top top",
+            end: "35% top",
+            scrub: 0.6,
+            // will-change só enquanto a cena está em movimento
+            onToggle: (self) => gsap.set(moving, { willChange: self.isActive ? "transform" : "auto" }),
+          },
+        })
+        .to(".hero-visual", { y: 120 }, 0)
+        .to(stack, { rotateX: 50, rotateY: -12, scale: 0.8, transformOrigin: "50% 50%" }, 0)
+        .to(wire, { z: -140 }, 0)
+        .to(code, { z: 140 }, 0)
+        .to(".bp-plate", { opacity: 1, duration: 0.3 }, 0.2)
+        // rótulos "levantam" do plano e ficam de frente para quem lê
+        .fromTo(".bp-tag", { rotateX: 0 }, { opacity: 1, rotateX: -50, transformOrigin: "50% 100%", duration: 0.3, stagger: 0.08 }, 0.35);
     });
   });
 
@@ -140,8 +162,8 @@ export function Hero() {
             </div>
           </div>
 
-          <div className="hero-visual [perspective:1200px] lg:col-span-5 lg:mt-10">
-            <div className="mx-auto max-w-[36rem] lg:mr-0">
+          <div className="hero-visual lg:col-span-5 lg:mt-10">
+            <div className="mx-auto max-w-[36rem] [perspective:1400px] lg:mr-0">
               <HeroBlueprint />
             </div>
           </div>
